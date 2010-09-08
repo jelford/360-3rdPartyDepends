@@ -28,3 +28,7 @@ tag:
 			<category android:name="android.intent.category.DEFAULT" />
 		</intent-filter>
 	</service> 
+	
+* 360ContentSlurp_code-example.tar.gz is a code example to demonstrate usage of
+the new functionality. You'll need to make sure you import clientDepends.jar
+into the project (or link to it in eclipse).
