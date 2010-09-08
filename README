@@ -19,12 +19,12 @@ added in order to publish the IPC services. Put them just before the </applicati
 tag:
 
   <!--  For providing access to the database & subscription to remote services -->
-	<provider android:name="org.james.idl.DatabaseProvider" 
-				android:authorities="org.james.idl.databaseaccess"/>
+	<provider android:name="com.vodafone360.people.service.aidl.DatabaseProvider" 
+				android:authorities="com.vodafone360.people.service.aidl.databaseaccess"/>
 	
-	<service android:name="org.james.idl.IdlPeopleInterface">
+	<service android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface">
 		<intent-filter>
-			<action android:name="org.james.idl.IDatabaseSubscriptionService" />
+			<action android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface" />
 			<category android:name="android.intent.category.DEFAULT" />
 		</intent-filter>
-	</service>
+	</service> 
