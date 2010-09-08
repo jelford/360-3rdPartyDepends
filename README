@@ -1,0 +1,30 @@
+This directory contains a couple of auxilliary files that don't really belong 
+in the 360-Engine-for-Android project (they will go in the 360-UI-for-Android 
+project, or in clients, etc...):
+
+* build_auto.xml and build_checkstyle.xml are files I've been using in the build 
+process. I expect these to be removed once we bring my build process inline 
+with yours. The key thing here is that build_auto.xml contains instructions for 
+getting the aidl files properly compiled into the /gen folder.
+
+* clientDepends.jar contains the classes that clients depend on in order to make 
+use of this service. It does not include the raw AIDL files, instead it 
+contains the compiled (generated) .class files that result from them. it also 
+contains the com.vodafone360.people.datatypes.Identity & BaseDatatype classes, 
+as well as their dependencies within the Engine code (LogUtils, Settings...). This is 
+necessary for us to pass out the Identity datatype. 
+
+* The AndroidManifest.xml file in 360-UI-for-Android needs for following lines
+added in order to publish the IPC services. Put them just before the </application>
+tag:
+
+  <!--  For providing access to the database & subscription to remote services -->
+	<provider android:name="org.james.idl.DatabaseProvider" 
+				android:authorities="org.james.idl.databaseaccess"/>
+	
+	<service android:name="org.james.idl.IdlPeopleInterface">
+		<intent-filter>
+			<action android:name="org.james.idl.IDatabaseSubscriptionService" />
+			<category android:name="android.intent.category.DEFAULT" />
+		</intent-filter>
+	</service>
