@@ -605,7 +605,7 @@
 	</target>
 			
 	<target name="allProcessStart" depends="clean,dirs,resource-src,aidl,compile" />
-	<target name="allProcess" depends="init_app,make_config_file,package-resources,debug,release,sign-release-apk" />
+	<target name="allProcess" depends="init_app,package-resources,debug,release,sign-release-apk" />
 	<target name="testOnDevice" depends="allProcess,uninstall,install-debug,test-debug,run-tests" />
 	<target name="devonly" depends="allProcessStart,dex,DevPro" />
 
