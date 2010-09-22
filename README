@@ -1,34 +1,66 @@
-This directory contains a couple of auxilliary files that don't really belong 
-in the 360-Engine-for-Android project (they will go in the 360-UI-for-Android 
-project, or in clients, etc...):
+# The following describes setting up & building 360 People client code for the new AIDL API access:
 
-* build_auto.xml and build_checkstyle.xml are files I've been using in the build 
-process. I expect these to be removed once we bring my build process inline 
-with yours. The key thing here is that build_auto.xml contains instructions for 
-getting the aidl files properly compiled into the /gen folder.
+# Get all the files you need
+$ git clone git://github.com/vfpeopledev/360-Engine-for-Android.git
+$ git clone git@github.com:jelford/360-3rdPartyDepends.git
+$ git clone git@github.com:360/360-UI-for-Android.git
 
-* clientDepends.jar contains the classes that clients depend on in order to make 
-use of this service. It does not include the raw AIDL files, instead it 
-contains the compiled (generated) .class files that result from them. it also 
-contains the com.vodafone360.people.datatypes.Identity & BaseDatatype classes, 
-as well as their dependencies within the Engine code (LogUtils, Settings...). This is 
-necessary for us to pass out the Identity datatype. 
+$ cd 360-UI-for-Android
+$ git checkout -b ui-refresh origin/ui-refresh
 
-* The AndroidManifest.xml file in 360-UI-for-Android needs for following lines
-added in order to publish the IPC services. Put them just before the </application>
-tag:
+# Set up your local build properties - these will be different for you.
+$ echo env.USERNAME_360=james > local.properties
+$ echo sdk.dir=/home/james/Programs/android-sdk-linux_86/ > build_property_files/james.properties
+$ echo git.dir=/usr/local/git/bin/git >> build_property_files/james.properties 
+$ echo engine.project.name=360-Engine-for-Android >> build_property_files/james.properties
 
-  <!--  For providing access to the database & subscription to remote services -->
-	<provider android:name="com.vodafone360.people.service.aidl.DatabaseProvider" 
-				android:authorities="com.vodafone360.people.service.aidl.databaseaccess"/>
-	
-	<service android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface">
-		<intent-filter>
-			<action android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface" />
-			<category android:name="android.intent.category.DEFAULT" />
-		</intent-filter>
-	</service> 
-	
-* 360ContentSlurp_code-example.tar.gz is a code example to demonstrate usage of
-the new functionality. You'll need to make sure you import clientDepends.jar
-into the project (or link to it in eclipse).
+# Should be ready to build.
+# Currently, it builds fine against commits: UI - 3b0dbda317, Engine - 15cd7ccfa
+$ ant debug -propertyfile local.properties
+
+# Done with generic make instructions - time to enable the AIDL APIs
+# Insert the following lines in AndroidManifest (can copy & paste them 
+# from the bottom of ../360-Engine-for-Android/AndroidManifest.xml)
+# overwriting the lines "</application>" & "<uses-sdk...>"
+gedit AndroidManifest.xml &
+
+     		<!--  Provides API access to other processes -->
+		  <provider
+			  android:name="com.vodafone360.people.service.aidl.DatabaseProvider" 
+			  android:authorities="com.vodafone360.people.service.aidl.databaseaccess"
+			  android:permission="com.vodafone360.people.service.aidl.permission.FullAccess"/>
+
+		  <service android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface"
+		    android:permission="com.vodafone360.people.service.aidl.permission.FullAccess">
+			  <intent-filter>
+				  <action android:name="com.vodafone360.people.service.aidl.IdlPeopleInterface" />
+				  <category android:name="android.intent.category.DEFAULT" />
+			  </intent-filter>
+		  </service>
+		  
+      </application>
+      
+      <uses-sdk android:minSdkVersion="3" />
+      
+	    <permission
+		    android:protectionLevel="signature"
+		    android:label="Access Vodafone 360 People"
+		    android:name="com.vodafone360.people.service.aidl.permission.FullAccess"
+	    />
+
+# Update the configuration properties to allow the new services - insert
+# the following line at the bottom of config.properties:
+gedit res/raw/config.properties
+
+      allow-aidl=true
+
+# Remake with the new capabilities enables:
+$ ant debug -propertyfile local.properties
+
+# Uninstall any existing installation of 360 People
+$ adb uninstall com.vodafone360.people
+
+# Now load up your new client
+$ adb install bin/360People-debug.apk
+
+
